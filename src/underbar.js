@@ -107,17 +107,13 @@ var _ = {};
 
     // Produce a duplicate-free version of the array.
     _.uniq = function(array) {
-        // var result = [], appeared;
-        // _.each(array, function(target) {
-        //     appeared = false;
-        //     _.each(array, function(value) {
-        //         if (value == target && appeared) {
-        //             array.pop(value);
-        //             appeared = true;
-        //         }
-        //     });
-        // });
-        // return array;
+        var arr = [];
+        _.each(array, function(item, index, list) {
+            if (_.indexOf(arr, item) === -1) {
+                arr.push(item);
+            }
+        });
+        return arr;
     };
 
     // Return the results of applying an iterator to each element.
@@ -152,14 +148,10 @@ var _ = {};
 
     // Calls the method named by methodName on each value in the list.
     // Note: you will nead to learn a bit about .apply to complete this.
-    _.invoke = function(collection, functionOrKey, args) {
-        return _.map(collection, function(value, key) {
-            if (typeof functionOrKey === "function") {
-                return functionOrKey.apply(value, args);
-            }
-            if (typeof functionOrKey === "string") {
-                return value.functionOrKey;
-            }
+    _.invoke = function(list, functionOrKey, args) {
+        return _.map(list, function(item, index, list) {
+            var myParams = [item, args, arguments];
+            return ((typeof functionOrKey === "function") ? functionOrKey : item[functionOrKey]).apply(item, myParams);
         });
     };
 
@@ -186,7 +178,7 @@ var _ = {};
                 previousValue = value;
                 initial = true;
             } else {
-                myParameters = [previousValue, value ,arguments];
+                myParameters = [previousValue, value, arguments];
                 previousValue = iterator.apply(context, myParameters);
             }
         });
@@ -218,21 +210,26 @@ var _ = {};
             var myParams = [item, arguments];
             return !!predicate.apply(context, myParams);
         }, true);
-
     };
 
     // Determine whether any of the elements pass a truth test. If no iterator is
     // provided, provide a default one
-    _.some = function(collection, iterator) {
+    _.some = function(collection, predicate) {
         // TIP: There's a very clever way to re-use every() here.
-        iterator || (iterator = _.identity);
-        // if (_.every(item, iterator)) {return true}
-        // return _.reduce(collection, function(everTrue, item) {
-        //     if (everTrue) {
-        //         return true;
-        //     }
-        //     return _.every(item, iterator);
-        // });
+        predicate || (predicate = _.identity);
+        var result = false;
+        if (_.every(collection, predicate)) {
+            result = true;
+        } else {
+            result = _.reduce(collection, function(wasTrue, item) {
+                if (wasTrue) {
+                    return true;
+                }
+                var myParams = [item, arguments];
+                return !!predicate.apply(context, myParams);
+            }, false);
+        }
+        return result;
     };
 
 
@@ -254,11 +251,36 @@ var _ = {};
     //   }, {
     //     bla: "even more stuff"
     //   }); // obj1 now contains key1, key2, key3 and bla
-    _.extend = function(obj) {};
+
+    // _.extend = function(obj) {
+    //     _.each(arguments, function(item, index, list) {
+    //         _.each(arguments[index], function(value, key, collection) {
+    //             obj[key] = value;
+    //         });
+    //     });
+    //     return obj;
+    // };
+    _.extend = function(obj) {
+        _.each(arguments, function(item, index, list) {
+            for (var prop in item) {
+                obj[prop] = item[prop];
+            }
+        });
+        return obj;
+    };
 
     // Like extend, but doesn't ever overwrite a key that already
     // exists in obj
-    _.defaults = function(obj) {};
+    _.defaults = function(obj) {
+        _.each(arguments, function(item, index, list) {
+            for (var prop in item) {
+                if (obj[prop] === undefined) {
+                    (obj[prop] = item[prop]);
+                }
+            }
+        });
+        return obj;
+    };
 
 
     /**
@@ -298,7 +320,14 @@ var _ = {};
     // _.memoize should return a function that when called, will check if it has
     // already computed the result for the given argument and return that value
     // instead if possible.
-    _.memoize = function(func) {};
+    _.memoize = function(func) {
+        var memoize = function() {
+            var cache = memoize.cache;
+            if (!cache) cache = func.apply(this, arguments);
+            return cache;
+        };
+        return memoize;
+    };
 
     // Delays a function for the given number of milliseconds, and then calls
     // it with the arguments supplied.
@@ -306,7 +335,9 @@ var _ = {};
     // The arguments for the original function are passed after the wait
     // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
     // call someFunction('a', 'b') after 500ms
-    _.delay = function(func, wait) {};
+    _.delay = function(func, wait) {
+
+    };
 
 
     /**
@@ -368,4 +399,3 @@ var _ = {};
     _.throttle = function(func, wait) {};
 
 }).call(this);
-t
