@@ -34,7 +34,6 @@ var _ = {};
     // return just the first element.
     _.first = function(array, n) {
         return n === undefined ? array[0] : array.slice(0, n);
-        
     };
 
     // Like first, but for the last elements. If n is undefined, return just the
@@ -219,6 +218,9 @@ var _ = {};
         // TIP: There's a very clever way to re-use every() here.
         predicate || (predicate = _.identity);
         var result = false;
+        if (collection.length === 0) {
+            return false;
+        }
         if (_.every(collection, predicate)) {
             result = true;
         } else {
@@ -315,19 +317,24 @@ var _ = {};
         };
     };
 
-    // Memoize an expensive function by storing its results. You may assume
-    // that the function takes only one argument and that it is a primitive.
+    // Memoize an expensive function by storing its results. You may assumeprimitive
+    // that the function takes only one argument and that it is a .
     //
     // _.memoize should return a function that when called, will check if it has
     // already computed the result for the given argument and return that value
     // instead if possible.
+
     _.memoize = function(func) {
-        var memoize = function() {
-            var cache = memoize.cache;
-            if (!cache) cache = func.apply(this, arguments);
-            return cache;
+        var memo = {};
+        return function() {
+            var args = Array.prototype.slice.call(arguments);
+            if (memo.hasOwnProperty(args)) {
+                return memo[args];
+            } else {
+                memo[args] = func.apply(this, args);
+                return memo[args];
+            }
         };
-        return memoize;
     };
 
     // Delays a function for the given number of milliseconds, and then calls
@@ -357,12 +364,12 @@ var _ = {};
     _.shuffle = function(array) {
         var arr = Array.prototype.slice.call(array);
         var i, j, rand, temp;
-        var randomlyPicked = function (min, max) {
+        var randomlyPicked = function(min, max) {
             if (arguments.length < 2) {
                 max = min;
                 min = 0;
             }
-        return min + Math.floor(Math.random() * (max - min + 1));
+            return min + Math.floor(Math.random() * (max - min + 1));
         };
         var n = arr.length;
         _.each(arr, function(value, index) {
