@@ -214,12 +214,24 @@ var _ = {};
     // Determine whether all of the elements match a truth test.
     _.every = function(collection, iterator) {
         // TIP: Try re-using reduce() here.
+        var predicate = iterator || _.identity;
+        return _.reduce(collection, function(passed, item) {
+            if (!passed) return false;
+            return !!predicate(item);
+        }, true);
     };
 
     // Determine whether any of the elements pass a truth test. If no iterator is
     // provided, provide                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               a default one
     _.some = function(collection, iterator) {
         // TIP: There's a very clever way to re-use every() here.
+        var predicate = iterator || _.identity;
+        if (Array.isArray(collection) && collection.length === 0) return false;
+        if (_.every(collection, predicate)) return true;
+        var reverse_test = _.every(collection, function(value) {
+            return !predicate(value);
+        });
+        return (reverse_test ? false : true);
     };
 
 
@@ -241,11 +253,33 @@ var _ = {};
     //   }, {
     //     bla: "even more stuff"
     //   }); // obj1 now contains key1, key2, key3 and bla
-    _.extend = function(obj) {};
+    _.extend = function(obj) {
+        var args = Array.prototype.slice.call(arguments);
+        var dest = args[0];
+        args = args.splice(1, args.length);
+        // console.log(args);
+        _.each(args, function(key, index, list) {
+            _.each(key, function(value, prop, object) {
+                dest[prop] = value;
+            });
+        });
+        return dest;
+    };
 
     // Like extend, but doesn't ever overwrite a key that already
     // exists in obj
-    _.defaults = function(obj) {};
+    _.defaults = function(obj) {
+        var args = Array.prototype.slice.call(arguments);
+        var dest = args[0];
+        args = args.splice(1, args.length);
+        // console.log(args);
+        _.each(args, function(key, index, list) {
+            _.each(key, function(value, prop, object) {
+                if (dest[prop] === undefined) dest[prop] = value;
+            });
+        });
+        return dest;
+    };
 
 
     /**
@@ -285,7 +319,20 @@ var _ = {};
     // _.memoize should return a function that when called, will check if it has
     // already computed the result for the given argument and return that value
     // instead if possible.
-    _.memoize = function(func) {};
+    _.memoize = function(func) {
+        var result = {};
+        return function() {
+            var args = Array.prototype.slice.call(arguments);
+            if (result.hasOwnProperty(args)) {
+                return result[args];
+            } else {
+                result[args] = func.apply(this, args);
+                return result[args];
+            }
+        };
+    };
+
+
 
     // Delays a function for the given number of milliseconds, and then calls
     // it with the arguments supplied.
@@ -293,7 +340,13 @@ var _ = {};
     // The arguments for the original function are passed after the wait
     // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
     // call someFunction('a', 'b') after 500ms
-    _.delay = function(func, wait) {};
+    _.delay = function(func, wait) {
+        var n = wait || 5000;
+        var args = Array.prototype.slice.call(arguments, 2);
+        return setTimeout(function() {
+            func.apply(this, args);
+        }, n);
+    };
 
 
     /**
@@ -306,7 +359,21 @@ var _ = {};
     // TIP: This function's test suite will ask that you not modify the original
     // input array. For a tip on how to make a copy of an array, see:
     // http://mdn.io/Array.prototype.slice
-    _.shuffle = function(array) {};
+    _.shuffle = function(array) {
+        var result = Array.prototype.slice(array);
+        var rand_int = function(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        };
+        var rand_num, temp;
+        _.each(result, function(item, index) {
+            rand_num = rand_int(0, result.length - 1);
+            temp = result[index];
+            result[index] = result[rand_num];
+            result[rand_num] = temp;
+        });
+        return result;
+    };
+
 
 
     /**
