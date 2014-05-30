@@ -33,11 +33,8 @@ var _ = {};
     // Return an array of the first n elements of an array. If n is undefined,
     // return just the first element.
     _.first = function(array, n) {
-        if (n === undefined || n === null) {
-            return array[0];
-        } else {
-            return array.slice(0, n);
-        }
+        return n === undefined ? array[0] : array.slice(0, n);
+
     };
 
     // Like first, but for the last elements. If n is undefined, return just the
@@ -383,19 +380,19 @@ var _ = {};
     // Example:
     // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
     _.zip = function() {
-        var args = Array.prototype.slice.call(arguments);
-        var result = [];
-        var max_length = args[0].length;
-        _.each(args, function(item, index) {
-            var element_concat = [];
-            console.log(item[index]);
-            _.each(args, function(item) {
-                // console.log(item[i]);
-                element_concat.push(item[index]);
-            })
-            // console.log(element_concat);
-            result[i] = element_concat;
-        })
+        // var args = Array.prototype.slice.call(arguments);
+        // var result = [];
+        // var max_length = args[0].length;
+        // _.each(args, function(item, index) {
+        //     var element_concat = [];
+        //     console.log(item[index]);
+        //     _.each(args, function(item) {
+        //         // console.log(item[i]);
+        //         element_concat.push(item[index]);
+        //     })
+        //     // console.log(element_concat);
+        //     result[i] = element_concat;
+        // });
     };
 
     // Takes a multidimensional array and converts it to a one-dimensional array.
