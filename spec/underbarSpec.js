@@ -570,13 +570,6 @@ describe('sortBy', function() {
   });
 });
 
-describe('flatten', function() {
-  it('can flatten nested arrays', function() {
-    var nestedArray = [1, [2], [3, [[[4]]]]];
-
-    expect(_.flatten(nestedArray)).to.eql([1,2,3,4]);
-  });
-});
 
 describe('zip', function() {
   it('should zip together arrays of different lengths', function() {
@@ -590,12 +583,22 @@ describe('zip', function() {
   });
 });
 
+describe('flatten', function() {
+  it('can flatten nested arrays', function() {
+    var nestedArray = [1, [2], [3, [[[4]]]]];
+
+    expect(_.flatten(nestedArray)).to.eql([1,2,3,4]);
+  });
+});
+
+
 describe('intersection', function() {
   it('should take the set intersection of two arrays', function() {
-    var stooges = ['moe', 'curly', 'larry'];
-    var leaders = ['moe', 'groucho'];
+    var stooges = ['moe', 'curly', 'larry',3];
+    var leaders = ['moe', 'groucho',3];
+    // var hey = ['moe', 5, 3];
 
-    expect(_.intersection(stooges, leaders)).to.eql(['moe']);
+    expect(_.intersection(stooges, leaders)).to.eql(['moe',3]);
   });
 });
 
